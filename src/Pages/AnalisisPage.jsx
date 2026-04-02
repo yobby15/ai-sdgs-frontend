@@ -1,9 +1,12 @@
-import { useState } from 'react';
 import { motion } from 'motion/react';
 import AnalisisHeader from '../components/AnalisisPage/AnalisisHeader';
 import TypeSelector from '../components/AnalisisPage/TypeSelector';
 import UploadArea from '../components/AnalisisPage/UploadArea';
 import TypeDescription from '../components/AnalisisPage/TypeDescription';
+import AnalisisResult from '../components/AnalisisPage/AnalisisResult';
+import { useState } from 'react';
+import { useDispatch } from 'react-redux';
+import { resetAnalisis } from '../store/analisisSlice';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -17,11 +20,17 @@ const itemVariants = {
 
 const AnalisisPage = () => {
   const [type, setType] = useState('T1');
+  const dispatch = useDispatch();
+
+  const handleTypeChange = (newType) => {
+    setType(newType);
+    dispatch(resetAnalisis());
+  };
 
   return (
-    <motion.div 
+    <motion.div
       variants={containerVariants}
-      initial="hidden" 
+      initial="hidden"
       animate="visible"
       className="relative z-10 pt-10 pb-16 px-8 max-w-195 mx-auto"
     >
@@ -30,11 +39,15 @@ const AnalisisPage = () => {
       </motion.div>
 
       <motion.div variants={itemVariants}>
-        <TypeSelector type={type} setType={setType} />
+        <TypeSelector type={type} setType={handleTypeChange} />
       </motion.div>
 
       <motion.div variants={itemVariants}>
         <UploadArea type={type} />
+      </motion.div>
+
+      <motion.div variants={itemVariants}>
+        <AnalisisResult />
       </motion.div>
 
       <motion.div variants={itemVariants}>
