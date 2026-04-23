@@ -41,11 +41,13 @@ const UploadArea = ({ type }) => {
   const handleDrop = (e) => {
     e.preventDefault();
     setDrag(false);
+    if (isLoading) return;
     const file = e.dataTransfer.files[0];
     handleFile(file);
   };
 
   const handleChange = (e) => {
+    if (isLoading) return;
     const file = e.target.files[0];
     handleFile(file);
     e.target.value = '';
