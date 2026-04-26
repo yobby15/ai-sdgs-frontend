@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { SDG_GOALS, typeColor, typeBg } from '../../data/constants';
 import { SkorBadge } from '../SharedUI';
 
-const PublikasiList = ({ filtered }) => {
+const PublikasiList = ({ filtered, onSelectDoc }) => {
   return (
     <div className="flex flex-col">
       <AnimatePresence mode="popLayout">
@@ -38,8 +38,11 @@ const PublikasiList = ({ filtered }) => {
             </div>
             <SkorBadge skor={doc.skor} />
             <span className="text-[11px] text-slate-400 shrink-0 hidden sm:block w-20 text-right">{doc.date}</span>
-            <button className="py-1.5 px-3.5 rounded-lg border-none bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold transition-colors cursor-pointer shrink-0">
-              ↓ Unduh
+            <button 
+              onClick={() => onSelectDoc(doc)}
+              className="py-1.5 px-3.5 rounded-lg border-none bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold transition-colors cursor-pointer shrink-0"
+            >
+              👁 Lihat Analisis
             </button>
           </motion.div>
         ))}

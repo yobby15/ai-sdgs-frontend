@@ -6,7 +6,23 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 const loadHistoryFromCache = () => {
   try {
     const saved = localStorage.getItem('sdg_ai_history');
-    return saved ? JSON.parse(saved) : [];
+    if (!saved) return [];
+    
+    const parsed = JSON.parse(saved);
+    const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
+    const now = new Date().getTime();
+
+    const filtered = parsed.filter(item => {
+      if (!item.analyzedAt) return true; 
+      const itemTime = new Date(item.analyzedAt).getTime();
+      return (now - itemTime) < thirtyDaysInMs;
+    });
+
+    if (filtered.length !== parsed.length) {
+      localStorage.setItem('sdg_ai_history', JSON.stringify(filtered));
+    }
+
+    return filtered;
   } catch {
     return [];
   }
