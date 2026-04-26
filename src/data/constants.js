@@ -64,33 +64,75 @@ export const SDG_GOALS = [
 ];
 
 export const RADAR_DATA = [
-  { subject: 'Sosial',      T1: 82, T2: 71, T3: 68 },
-  { subject: 'Ekonomi',     T1: 74, T2: 85, T3: 79 },
-  { subject: 'Lingkungan',  T1: 63, T2: 58, T3: 88 },
+  { subject: 'Sosial', T1: 82, T2: 71, T3: 68 },
+  { subject: 'Ekonomi', T1: 74, T2: 85, T3: 79 },
+  { subject: 'Lingkungan', T1: 63, T2: 58, T3: 88 },
   { subject: 'Tata Kelola', T1: 91, T2: 65, T3: 72 },
-  { subject: 'Inovasi',     T1: 55, T2: 78, T3: 94 },
-  { subject: 'Kemitraan',   T1: 70, T2: 82, T3: 61 },
+  { subject: 'Inovasi', T1: 55, T2: 78, T3: 94 },
+  { subject: 'Kemitraan', T1: 70, T2: 82, T3: 61 },
 ];
 
 export const TREND_DATA = [
-  { bulan: 'Agu', skor: 62 }, { bulan: 'Sep', skor: 67 }, { bulan: 'Okt', skor: 71 },
-  { bulan: 'Nov', skor: 69 }, { bulan: 'Des', skor: 78 }, { bulan: 'Jan', skor: 83 },
+  { bulan: 'Agu', skor: 62 },
+  { bulan: 'Sep', skor: 67 },
+  { bulan: 'Okt', skor: 71 },
+  { bulan: 'Nov', skor: 69 },
+  { bulan: 'Des', skor: 78 },
+  { bulan: 'Jan', skor: 83 },
   { bulan: 'Feb', skor: 88 },
 ];
 
 export const TOP_SDG_DATA = [
-  { sdg: 'SDG 4',  skor: 91, color: '#C5192D' }, { sdg: 'SDG 13', skor: 87, color: '#3F7E44' },
-  { sdg: 'SDG 9',  skor: 82, color: '#FD6925' }, { sdg: 'SDG 17', skor: 78, color: '#19486A' },
-  { sdg: 'SDG 11', skor: 74, color: '#FD9D24' }, { sdg: 'SDG 3',  skor: 69, color: '#4C9F38' },
+  { sdg: 'SDG 4', skor: 91, color: '#C5192D' },
+  { sdg: 'SDG 13', skor: 87, color: '#3F7E44' },
+  { sdg: 'SDG 9', skor: 82, color: '#FD6925' },
+  { sdg: 'SDG 17', skor: 78, color: '#19486A' },
+  { sdg: 'SDG 11', skor: 74, color: '#FD9D24' },
+  { sdg: 'SDG 3', skor: 69, color: '#4C9F38' },
 ];
 
 export const RECENT_DOCS = [
-  { name: 'Renstra Universitas 2024-2028.pdf',    type: 'T1', skor: 87, sdgs: [4, 9, 17], status: 'Selesai',      date: '06 Mar 2026' },
-  { name: 'Blog: Kampus Hijau & Energi Bersih',   type: 'T2', skor: 74, sdgs: [7, 13],    status: 'Selesai',      date: '04 Mar 2026' },
-  { name: 'Jurnal: SDGs & Higher Education QS',   type: 'T3', skor: 92, sdgs: [4, 16],    status: 'Selesai',      date: '02 Mar 2026' },
-  { name: 'Laporan Keuangan Hibah 2025.pdf',      type: 'T1', skor: 61, sdgs: [1, 8],     status: 'Perlu Revisi', date: '28 Feb 2026' },
-  { name: 'Opini: Kesetaraan Gender di Akademia', type: 'T2', skor: 79, sdgs: [5, 10],    status: 'Selesai',      date: '25 Feb 2026' },
+  {
+    name: 'Renstra Universitas 2024-2028.pdf',
+    type: 'T1',
+    skor: 87,
+    sdgs: [4, 9, 17],
+    status: 'Selesai',
+    date: '06 Mar 2026',
+  },
+  {
+    name: 'Blog: Kampus Hijau & Energi Bersih',
+    type: 'T2',
+    skor: 74,
+    sdgs: [7, 13],
+    status: 'Selesai',
+    date: '04 Mar 2026',
+  },
+  {
+    name: 'Jurnal: SDGs & Higher Education QS',
+    type: 'T3',
+    skor: 92,
+    sdgs: [4, 16],
+    status: 'Selesai',
+    date: '02 Mar 2026',
+  },
+  {
+    name: 'Laporan Keuangan Hibah 2025.pdf',
+    type: 'T1',
+    skor: 61,
+    sdgs: [1, 8],
+    status: 'Perlu Revisi',
+    date: '28 Feb 2026',
+  },
+  {
+    name: 'Opini: Kesetaraan Gender di Akademia',
+    type: 'T2',
+    skor: 79,
+    sdgs: [5, 10],
+    status: 'Selesai',
+    date: '25 Feb 2026',
+  },
 ];
 
 export const typeColor = { T1: '#0EA5E9', T2: '#10B981', T3: '#8B5CF6' };
-export const typeBg    = { T1: '#E0F2FE', T2: '#D1FAE5', T3: '#EDE9FE' };
+export const typeBg = { T1: '#E0F2FE', T2: '#D1FAE5', T3: '#EDE9FE' };

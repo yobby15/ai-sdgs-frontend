@@ -7,7 +7,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => config,
-  (error) => Promise.reject(error)
+  (error) => Promise.reject(error),
 );
 
 api.interceptors.response.use(
@@ -18,7 +18,7 @@ api.interceptors.response.use(
       error.message ||
       'Terjadi kesalahan pada server';
     return Promise.reject(new Error(message));
-  }
+  },
 );
 
 export default api;
