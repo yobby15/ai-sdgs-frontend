@@ -1,0 +1,88 @@
+default:
+  image: node:20-alpine
+  tags:
+    - web
+
+stages:
+  - install
+  - lint
+  - test 
+  - deploy
+
+variables:
+  NODE_ENV: "test"
+
+.node_cache: &node_cache
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}"
+    paths:
+      - node_modules/
+    policy: pull        # lint/test jobs only pull, never push
+
+# ── STAGE 0: Install ─────────────────────────────────────────────────────────────────────
+
+install_dependencies:
+  stage: install
+  only:
+    - dev
+  cache:
+    key: "${CI_COMMIT_REF_SLUG}"
+    paths:
+      - node_modules/
+    policy: push        # only install job writes to cache
+  script:
+    - npm install 
+
+# ── STAGE 1: Lint ─────────────────────────────────────────────────────────────────────────
+
+eslint:
+  stage: lint
+  <<: *node_cache
+  only:
+    - dev
+  script:
+    - ./node_modules/.bin/eslint . --ext .js --max-warnings 0
+  allow_failure: false
+
+prettier_check:
+  stage: lint
+  <<: *node_cache
+  only:
+    - dev
+  script:
+    - ./node_modules/.bin/prettier --check "src/**/*.{js,json}"
+  allow_failure: true
+
+# ── STAGE 2: Test ─────────────────────────────────────────────────────────────────────────
+
+unit_test:
+  stage: test
+  <<: *node_cache
+  only:
+    - dev
+  script:
+    - npm install --prefer-offline
+    - ./node_modules/.bin/jest --coverage --passWithNoTests
+  coverage: '/Lines\s*:\s*(\d+\.?\d*)%/'
+  artifacts:
+    when: always
+    reports:
+      junit: junit.xml
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    expire_in: 7 days
+
+# ── STAGE 3: Deploy Preview Dev ───────────────────────────────────────────────────────────
+
+deploy_beta:
+  stage: deploy
+  tags:
+    - web
+  only:
+    - dev
+  <<: *node_cache
+  script:
+    - npx vercel pull --yes --environment=production --token=$VERCEL_TOKEN
+    - npx vercel build --prod --token=$VERCEL_TOKEN
+    - npx vercel deploy --prebuilt --prod --token=$VERCEL_TOKEN
