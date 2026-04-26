@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
+import { Link } from 'react-router-dom';
 
 const FeatureCard = ({ card, variants }) => {
   const [isHovered, setIsHovered] = useState(false);
@@ -62,8 +63,9 @@ const FeatureCard = ({ card, variants }) => {
         </span>
       </div>
 
-      <button
-        className="block w-full py-3 px-4 rounded-lg border text-[13.5px] font-semibold text-center tracking-tight transition-all duration-200"
+      <Link
+        to="/analisis"
+        className="block w-full py-3 px-4 rounded-lg border text-[13.5px] font-semibold text-center tracking-tight transition-all duration-200 no-underline"
         style={{
           color: card.accent,
           borderColor: `${card.accent}33`,
@@ -71,7 +73,7 @@ const FeatureCard = ({ card, variants }) => {
         }}
       >
         Mulai Analisis {card.tag} →
-      </button>
+      </Link>
     </motion.div>
   );
 };
