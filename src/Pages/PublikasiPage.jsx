@@ -5,6 +5,7 @@ import { selectAnalisisHistory } from '../store/analisisSlice';
 import PublikasiHeader from '../components/PublikasiPage/PublikasiHeader';
 import PublikasiFilter from '../components/PublikasiPage/PublikasiFilter';
 import PublikasiList from '../components/PublikasiPage/PublikasiList';
+import PublikasiModal from '../components/PublikasiPage/PublikasiModal';
 
 const formatDoc = (doc) => {
   let aiData = doc.result || doc;
@@ -63,6 +64,7 @@ const formatDoc = (doc) => {
 
 const PublikasiPage = () => {
   const [filter, setFilter] = useState('Semua');
+  const [selectedDoc, setSelectedDoc] = useState(null);
   const history = useSelector(selectAnalisisHistory);
   
   const formattedDocs = history.map(formatDoc);
@@ -85,8 +87,10 @@ const PublikasiPage = () => {
       <div className="bg-white rounded-[14px] border border-slate-900/5 p-6 shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
         <PublikasiFilter filter={filter} setFilter={setFilter} />
         
-        <PublikasiList filtered={filtered} />
+        <PublikasiList filtered={filtered} onSelectDoc={setSelectedDoc} />
       </div>
+
+      <PublikasiModal selectedDoc={selectedDoc} onClose={() => setSelectedDoc(null)} />
     </motion.div>
   );
 };
