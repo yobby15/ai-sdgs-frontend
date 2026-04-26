@@ -39,7 +39,7 @@ const PublikasiList = ({ filtered }) => {
             <SkorBadge skor={doc.skor} />
             <span className="text-[11px] text-slate-400 shrink-0 hidden sm:block w-20 text-right">{doc.date}</span>
             <button className="py-1.5 px-3.5 rounded-lg border-none bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold transition-colors cursor-pointer shrink-0">
-              ↓ Unduh
+              👁 Lihat Analisis
             </button>
           </motion.div>
         ))}

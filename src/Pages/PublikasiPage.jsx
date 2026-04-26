@@ -1,18 +1,60 @@
 import { useState } from 'react';
 import { motion } from 'motion/react';
-import { RECENT_DOCS } from '../data/constants';
+import { useSelector } from 'react-redux';
+import { selectAnalisisHistory } from '../store/analisisSlice';
 import PublikasiHeader from '../components/PublikasiPage/PublikasiHeader';
 import PublikasiFilter from '../components/PublikasiPage/PublikasiFilter';
 import PublikasiList from '../components/PublikasiPage/PublikasiList';
 
+const formatDoc = (doc) => {
+  let aiData = doc.result || doc;
+  if (typeof aiData === 'string') {
+    try {
+      aiData = JSON.parse(aiData);
+    } catch {
+      // ignore
+    }
+  }
+
+  let score = 0;
+  if (aiData.type_result === 'strong_evidence') score = 95;
+  else if (aiData.type_result === 'moderate_evidence') score = 75;
+  else if (aiData.type_result) score = 50;
+  else score = doc.skor || 0;
+
+  const sdgs = [];
+  if (aiData.SDG_number) sdgs.push(parseInt(aiData.SDG_number, 10));
+  if (aiData.additional_kwargs?.additional_sdg) {
+    aiData.additional_kwargs.additional_sdg.forEach(s => sdgs.push(parseInt(s.SDG_number, 10)));
+  }
+
+  // Dedup sdgs
+  const uniqueSdgs = [...new Set(sdgs)];
+
+  return {
+    id: doc.job_id || doc.name,
+    name: doc.fileName || doc.name || 'Dokumen Analisis',
+    type: doc.documentType || doc.type || 'T1',
+    skor: score,
+    sdgs: uniqueSdgs.length > 0 ? uniqueSdgs : (doc.sdgs || []),
+    date: doc.analyzedAt
+      ? new Date(doc.analyzedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+      : doc.date,
+    originalData: doc
+  };
+};
+
 const PublikasiPage = () => {
   const [filter, setFilter] = useState('Semua');
+  const history = useSelector(selectAnalisisHistory);
   
+  const formattedDocs = history.map(formatDoc);
+
   const filtered = filter === 'Semua' 
-    ? RECENT_DOCS 
+    ? formattedDocs
     : filter === 'Skor Tinggi' 
-      ? RECENT_DOCS.filter(d => d.skor >= 80) 
-      : RECENT_DOCS.filter(d => d.type === filter);
+      ? formattedDocs.filter(d => d.skor >= 80)
+      : formattedDocs.filter(d => d.type === filter);
 
   return (
     <motion.div 
