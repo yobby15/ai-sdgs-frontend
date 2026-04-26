@@ -17,10 +17,27 @@ const formatDoc = (doc) => {
   }
 
   let score = 0;
-  if (aiData.type_result === 'strong_evidence') score = 95;
-  else if (aiData.type_result === 'moderate_evidence') score = 75;
-  else if (aiData.type_result) score = 50;
-  else score = doc.skor || 0;
+  let totalScore = 0;
+  let count = 0;
+
+  if (aiData.SDG_details && Array.isArray(aiData.SDG_details)) {
+    aiData.SDG_details.forEach(metric => {
+      if (metric.indicators && Array.isArray(metric.indicators)) {
+        metric.indicators.forEach(ind => {
+          if (ind.score_relevancy !== undefined && ind.score_relevancy !== null) {
+            totalScore += Number(ind.score_relevancy);
+            count++;
+          }
+        });
+      }
+    });
+  }
+
+  if (count > 0) {
+    score = Math.round((totalScore / count) * 100);
+  } else {
+    score = doc.skor || 0;
+  }
 
   const sdgs = [];
   if (aiData.SDG_number) sdgs.push(parseInt(aiData.SDG_number, 10));
