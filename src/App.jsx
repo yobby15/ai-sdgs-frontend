@@ -1,7 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import HeroPage from './Pages/HeroPage';
-import DashboardPage from './Pages/DashboardPage';
 import AnalisisPage from './Pages/AnalisisPage';
 import TargetPage from './Pages/TargetPage';
 import PublikasiPage from './Pages/PublikasiPage';
@@ -25,7 +24,6 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<HeroPage />} />
-        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/analisis" element={<AnalisisPage />} />
         <Route path="/target" element={<TargetPage />} />
         <Route path="/publikasi" element={<PublikasiPage />} />

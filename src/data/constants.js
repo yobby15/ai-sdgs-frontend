@@ -1,5 +1,4 @@
 export const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: '◈' },
   { id: 'analisis', label: 'Analisis Dokumen', icon: '⬡' },
   { id: 'target', label: 'Target SDGs', icon: '◎' },
   { id: 'publikasi', label: 'Publikasi', icon: '◇' },

@@ -6,12 +6,6 @@ import {
   resetAnalisis,
 } from '../../store/analisisSlice';
 
-const CLASSIFICATION_COLORS = {
-  'T1': 'bg-blue-100 text-blue-700 border-blue-200',
-  'T2': 'bg-purple-100 text-purple-700 border-purple-200',
-  'T3': 'bg-orange-100 text-orange-700 border-orange-200',
-};
-
 const AnalisisResult = () => {
   const dispatch = useDispatch();
   const status = useSelector(selectAnalisisStatus);
@@ -44,18 +38,20 @@ const AnalisisResult = () => {
 
     const { 
       resume_document, 
-      document_classification, 
-      evidence_type, 
+      type_result, 
       SDG_number, 
-      SDG_details 
+      SDG_details,
+      additional_kwargs
     } = aiData;
 
-    const badgeClass = CLASSIFICATION_COLORS[document_classification] || 'bg-slate-100 text-slate-700 border-slate-200';
+    const isStrongEvidence = type_result === 'strong_evidence';
+    const badgeClass = isStrongEvidence 
+        ? 'bg-blue-100 text-blue-800 border-blue-200' 
+        : 'bg-orange-100 text-orange-800 border-orange-200';
 
     return (
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-5 mb-5">
         
-        {/* Header Section */}
         <div className="flex items-start justify-between mb-4 border-b border-emerald-100 pb-3">
           <div>
             <p className="text-[15px] font-bold text-emerald-800 m-0">✅ Hasil Evaluasi THE Impact Ratings</p>
@@ -71,9 +67,9 @@ const AnalisisResult = () => {
             >
               Uji Dokumen Baru
             </button>
-            {document_classification && (
+            {type_result && (
               <div className={`px-3 py-1 rounded-full border text-[11px] font-bold uppercase ${badgeClass}`}>
-                {document_classification} • {evidence_type?.replace('_', ' ')}
+                {type_result.replace('_', ' ')}
               </div>
             )}
           </div>
@@ -86,7 +82,7 @@ const AnalisisResult = () => {
           </div>
         )}
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 mb-5">
           {SDG_details && SDG_details.length > 0 ? (
             SDG_details.map((detail, idx) => (
               <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
@@ -98,7 +94,7 @@ const AnalisisResult = () => {
                 
                 <div className="p-4 flex flex-col gap-3">
                   {detail.indicators?.map((ind, i) => {
-                    const score = ind.score_relevancy ?? ind.evaluation_score ?? 0;
+                    const score = ind.score_relevancy ?? 0;
                     
                     return (
                       <div key={i} className="flex flex-col gap-2">
@@ -114,17 +110,11 @@ const AnalisisResult = () => {
                         <p className="text-[12px] text-slate-600 m-0 italic border-l-2 border-slate-300 pl-2">
                           "{ind.justification}"
                         </p>
-
-                        {ind.recommendation_to_improve && score < 1 && (
-                          <div className="mt-2 bg-amber-50 border border-amber-200 p-3 rounded-lg flex gap-2 items-start">
-                            <span className="text-[14px]">💡</span>
-                            <div>
-                              <p className="text-[12px] font-bold text-amber-800 m-0 mb-0.5">Rekomendasi Perbaikan:</p>
-                              <p className="text-[12px] text-amber-700 m-0 leading-tight">
-                                {ind.recommendation_to_improve}
-                              </p>
-                            </div>
-                          </div>
+                        
+                        {ind.retrieval_source && (
+                          <p className="text-[10px] text-slate-400 mt-1 m-0 font-mono">
+                            Sumber Bukti: Dokumen Chunk {JSON.stringify(ind.retrieval_source.document_chunk_id)} | SDG Chunk {JSON.stringify(ind.retrieval_source.sdgs_chunk_id)}
+                          </p>
                         )}
                       </div>
                     );
@@ -136,6 +126,38 @@ const AnalisisResult = () => {
             <p className="text-[13px] text-slate-500 italic">Tidak ada detail metrik yang ditemukan.</p>
           )}
         </div>
+
+        {additional_kwargs && additional_kwargs.additional_sdg && additional_kwargs.additional_sdg.length > 0 && (
+          <div className="mb-4 bg-slate-50 p-4 rounded-xl shadow-sm border border-slate-200">
+            <p className="text-[13px] font-bold text-slate-700 mb-3 flex items-center gap-2">
+              <span>🔗</span> Potensi Keterkaitan SDG Lain
+            </p>
+            <div className="flex flex-col gap-3">
+              {additional_kwargs.additional_sdg.map((sdg_lain, idx) => (
+                <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
+                  <p className="text-[12px] font-bold text-sky-700 m-0 mb-1">
+                    SDG {sdg_lain.SDG_number}
+                  </p>
+                  <p className="text-[12px] text-slate-600 m-0 leading-relaxed">
+                    {sdg_lain.SDG_details}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {additional_kwargs && additional_kwargs.note && (
+          <div className="mt-2 bg-amber-50 border border-amber-200 p-4 rounded-xl flex gap-3 items-start shadow-sm">
+            <span className="text-[16px]">💡</span>
+            <div>
+              <p className="text-[13px] font-bold text-amber-800 m-0 mb-1">Catatan & Saran Perbaikan</p>
+              <p className="text-[13px] text-amber-700 m-0 leading-relaxed">
+                {additional_kwargs.note}
+              </p>
+            </div>
+          </div>
+        )}
 
       </div>
     );

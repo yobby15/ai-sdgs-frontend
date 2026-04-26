@@ -6,11 +6,9 @@ export const analyzeDocument = async (file, params = {}, onUploadProgress) => {
 
   const queryParams = new URLSearchParams({
     k: params.k ?? 10,
-    window_size: params.window_size ?? 2,
     model_name: params.model_name ?? 'gemini-2.5-flash',
-    type_model: params.type_model ?? 'gemini',
+    type_api: params.type_api ?? 'gemini',
     save_result: params.save_result ?? true,
-    save_path: params.save_path ?? './ai_result',
     ...(params.source ? { source: params.source } : {}),
   });
 
@@ -21,6 +19,11 @@ export const analyzeDocument = async (file, params = {}, onUploadProgress) => {
       : undefined,
   });
 
+  return response.data;
+};
+
+export const checkAnalysisStatus = async (jobId) => {
+  const response = await api.get(`/analyze/${jobId}`);
   return response.data;
 };
 

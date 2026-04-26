@@ -1,12 +1,46 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { analyzeDocument } from '../services/analisisService';
+import { analyzeDocument, checkAnalysisStatus } from '../services/analisisService';
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+const loadHistoryFromCache = () => {
+  try {
+    const saved = localStorage.getItem('sdg_ai_history');
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
+  }
+};
 
 export const submitAnalisis = createAsyncThunk(
   'analisis/submit',
-  async ({ file, params }, { rejectWithValue }) => {
+  async ({ file, type, params }, { rejectWithValue }) => {
     try {
-      const result = await analyzeDocument(file, params);
-      return result;
+      const initResult = await analyzeDocument(file, params);
+      
+      if (!initResult.job_id) return rejectWithValue('Gagal mendapatkan Job ID.');
+      
+      const jobId = initResult.job_id;
+      let attempts = 0;
+      
+      while (attempts < 120) {
+        const statusResult = await checkAnalysisStatus(jobId);
+        
+        if (statusResult.status === 'completed') {
+           return {
+             ...statusResult.result,
+             documentType: type,
+             analyzedAt: new Date().toISOString(),
+             fileName: file.name || file
+           };
+        } else if (statusResult.status === 'failed') {
+           return rejectWithValue(statusResult.error || 'Analisis gagal di server.');
+        }
+        
+        await delay(5000);
+        attempts++;
+      }
+      return rejectWithValue('Timeout menunggu hasil analisis.');
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -18,13 +52,10 @@ const analisisSlice = createSlice({
   initialState: {
     file: null,
     uploadProgress: 0,
-
     status: 'idle',
     error: null,
-
     result: null,
-
-    history: [],
+    history: loadHistoryFromCache(),
   },
   reducers: {
     setFile(state, action) {
@@ -40,43 +71,39 @@ const analisisSlice = createSlice({
       state.error = null;
       state.result = null;
     },
-    clearError(state) {
-      state.error = null;
-    },
+    clearHistory(state) {
+      state.history = [];
+      localStorage.removeItem('sdg_ai_history');
+    }
   },
   extraReducers: (builder) => {
     builder
       .addCase(submitAnalisis.pending, (state) => {
         state.status = 'loading';
         state.error = null;
-        state.result = null;
-        state.uploadProgress = 0;
       })
       .addCase(submitAnalisis.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.result = action.payload;
-        state.uploadProgress = 100;
-        // Tambahkan ke riwayat
-        state.history.unshift({
-          ...action.payload,
-          fileName: state.file,
-        });
+        
+        state.history.unshift(action.payload);
+        
+        localStorage.setItem('sdg_ai_history', JSON.stringify(state.history));
       })
       .addCase(submitAnalisis.rejected, (state, action) => {
         state.status = 'failed';
         state.error = action.payload;
-        state.uploadProgress = 0;
       });
   },
 });
 
-export const { setFile, setUploadProgress, resetAnalisis, clearError } = analisisSlice.actions;
+export const { setFile, resetAnalisis, clearHistory } = analisisSlice.actions;
 
 export const selectAnalisisStatus  = (state) => state.analisis.status;
 export const selectAnalisisResult  = (state) => state.analisis.result;
 export const selectAnalisisError   = (state) => state.analisis.error;
-export const selectAnalisisFile    = (state) => state.analisis.file;
-export const selectUploadProgress  = (state) => state.analisis.uploadProgress;
 export const selectAnalisisHistory = (state) => state.analisis.history;
+export const selectUploadProgress  = (state) => state.analisis.uploadProgress;
+export const selectAnalisisFile    = (state) => state.analisis.file;
 
 export default analisisSlice.reducer;
