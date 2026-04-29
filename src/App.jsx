@@ -4,6 +4,7 @@ import HeroPage from './Pages/HeroPage';
 import AnalisisPage from './Pages/AnalisisPage';
 import TargetPage from './Pages/TargetPage';
 import PublikasiPage from './Pages/PublikasiPage';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App = () => {
   return (
@@ -24,9 +25,26 @@ const App = () => {
 
       <Routes>
         <Route path="/" element={<HeroPage />} />
-        <Route path="/analisis" element={<AnalisisPage />} />
+
+        <Route
+          path="/analisis"
+          element={
+            <ProtectedRoute pageName="Analisis Dokumen" pageIcon="⬡">
+              <AnalisisPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/target" element={<TargetPage />} />
-        <Route path="/publikasi" element={<PublikasiPage />} />
+
+        <Route
+          path="/publikasi"
+          element={
+            <ProtectedRoute pageName="Publikasi" pageIcon="◇">
+              <PublikasiPage />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </div>
   );
