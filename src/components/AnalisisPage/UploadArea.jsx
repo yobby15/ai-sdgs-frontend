@@ -55,8 +55,8 @@ const UploadArea = ({ type }) => {
         file: urlInput,
         type: 'T2',
         params: { 
-          type_api: 'gemini', 
-          model_name: 'gemini-2.5-flash',
+          type_api: 'openrouter', 
+          model_name: 'z-ai/glm-5.1',
         },
       })
     );

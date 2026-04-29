@@ -2,34 +2,25 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {
   analyzeDocument,
   checkAnalysisStatus,
+  fetchHistory,
 } from '../services/analisisService';
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-const loadHistoryFromCache = () => {
-  try {
-    const saved = localStorage.getItem('sdg_ai_history');
-    if (!saved) return [];
-
-    const parsed = JSON.parse(saved);
-    const thirtyDaysInMs = 30 * 24 * 60 * 60 * 1000;
-    const now = new Date().getTime();
-
-    const filtered = parsed.filter((item) => {
-      if (!item.analyzedAt) return true;
-      const itemTime = new Date(item.analyzedAt).getTime();
-      return now - itemTime < thirtyDaysInMs;
-    });
-
-    if (filtered.length !== parsed.length) {
-      localStorage.setItem('sdg_ai_history', JSON.stringify(filtered));
+export const loadHistoryData = createAsyncThunk(
+  'analisis/loadHistory',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await fetchHistory();
+      if (response.status === 'success') {
+        return response.data;
+      }
+      return rejectWithValue('Gagal memuat history');
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
-
-    return filtered;
-  } catch {
-    return [];
   }
-};
+);
 
 export const submitAnalisis = createAsyncThunk(
   'analisis/submit',
@@ -77,7 +68,8 @@ const analisisSlice = createSlice({
     status: 'idle',
     error: null,
     result: null,
-    history: loadHistoryFromCache(),
+    history: [],
+    historyStatus: 'idle',
   },
   reducers: {
     setFile(state, action) {
@@ -95,7 +87,6 @@ const analisisSlice = createSlice({
     },
     clearHistory(state) {
       state.history = [];
-      localStorage.removeItem('sdg_ai_history');
     },
   },
   extraReducers: (builder) => {
@@ -107,13 +98,24 @@ const analisisSlice = createSlice({
       .addCase(submitAnalisis.fulfilled, (state, action) => {
         state.status = 'succeeded';
         state.result = action.payload;
-
-        state.history.unshift(action.payload);
-
-        localStorage.setItem('sdg_ai_history', JSON.stringify(state.history));
+        if (action.payload?.result !== null && action.payload?.result !== undefined) {
+          state.history.unshift(action.payload);
+        }
       })
       .addCase(submitAnalisis.rejected, (state, action) => {
         state.status = 'failed';
+        state.error = action.payload;
+      })
+      
+      .addCase(loadHistoryData.pending, (state) => {
+        state.historyStatus = 'loading';
+      })
+      .addCase(loadHistoryData.fulfilled, (state, action) => {
+        state.historyStatus = 'succeeded';
+        state.history = action.payload;
+      })
+      .addCase(loadHistoryData.rejected, (state, action) => {
+        state.historyStatus = 'failed';
         state.error = action.payload;
       });
   },
@@ -125,6 +127,7 @@ export const selectAnalisisStatus = (state) => state.analisis.status;
 export const selectAnalisisResult = (state) => state.analisis.result;
 export const selectAnalisisError = (state) => state.analisis.error;
 export const selectAnalisisHistory = (state) => state.analisis.history;
+export const selectAnalisisHistoryStatus = (state) => state.analisis.historyStatus; 
 export const selectUploadProgress = (state) => state.analisis.uploadProgress;
 export const selectAnalisisFile = (state) => state.analisis.file;
 

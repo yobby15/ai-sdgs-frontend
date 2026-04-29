@@ -31,37 +31,64 @@ const AnalisisResult = () => {
 
   if (status === 'succeeded' && result) {
     let aiData = result.result;
-    
+
     if (typeof aiData === 'string') {
       try { aiData = JSON.parse(aiData); } catch { /* abaikan */ }
     }
 
-    const { 
-      resume_document, 
-      type_result, 
-      SDG_number, 
+    if (!aiData) {
+      return (
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 px-6 py-5 mb-5">
+          <p className="text-[14px] font-bold text-orange-600 mb-1">⚠️ Hasil Tidak Tersedia</p>
+          <p className="text-[13px] text-orange-500 m-0">
+            LLM tidak menghasilkan output. Kemungkinan quota habis atau terjadi error pada model. Coba ulangi analisis.
+          </p>
+          <button
+            onClick={() => dispatch(resetAnalisis())}
+            className="mt-3 text-[12px] text-orange-400 underline cursor-pointer bg-transparent border-none"
+          >
+            Coba lagi
+          </button>
+        </div>
+      );
+    }
+
+    const {
+      resume_document,
+      type_result,
+      SDG_number,
       SDG_details,
       additional_kwargs
     } = aiData;
 
+    const docName = result.source || 'Dokumen';
+    const docDate = result.timestamp
+      ? new Date(result.timestamp).toLocaleString('id-ID', {
+          day: '2-digit', month: 'long', year: 'numeric',
+          hour: '2-digit', minute: '2-digit'
+        })
+      : null;
+
     const isStrongEvidence = type_result === 'strong_evidence';
-    const badgeClass = isStrongEvidence 
-        ? 'bg-blue-100 text-blue-800 border-blue-200' 
-        : 'bg-orange-100 text-orange-800 border-orange-200';
+    const badgeClass = isStrongEvidence
+      ? 'bg-blue-100 text-blue-800 border-blue-200'
+      : 'bg-orange-100 text-orange-800 border-orange-200';
 
     return (
       <div className="rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-5 mb-5">
-        
+
         <div className="flex items-start justify-between mb-4 border-b border-emerald-100 pb-3">
           <div>
             <p className="text-[15px] font-bold text-emerald-800 m-0">✅ Hasil Evaluasi THE Impact Ratings</p>
             <p className="text-[12px] text-emerald-600 m-0 mt-1">
               SDG Terdeteksi: <span className="font-bold">SDG {SDG_number || 'N/A'}</span>
             </p>
+            <p className="text-[12px] text-slate-500 m-0 mt-1">📄 {docName}</p>
+            {docDate && <p className="text-[11px] text-slate-400 m-0">🕐 {docDate}</p>}
           </div>
-          
+
           <div className="flex flex-col items-end gap-2">
-             <button
+            <button
               onClick={() => dispatch(resetAnalisis())}
               className="text-[12px] font-medium text-slate-500 hover:text-slate-700 underline cursor-pointer bg-transparent border-none"
             >
@@ -91,11 +118,11 @@ const AnalisisResult = () => {
                     Metrik {detail.ID_Metric}: {detail.metric_name}
                   </p>
                 </div>
-                
+
                 <div className="p-4 flex flex-col gap-3">
                   {detail.indicators?.map((ind, i) => {
                     const score = ind.score_relevancy ?? 0;
-                    
+
                     return (
                       <div key={i} className="flex flex-col gap-2">
                         <div className="flex items-start justify-between">
@@ -106,11 +133,11 @@ const AnalisisResult = () => {
                             Skor: {score}
                           </span>
                         </div>
-                        
+
                         <p className="text-[12px] text-slate-600 m-0 italic border-l-2 border-slate-300 pl-2">
                           "{ind.justification}"
                         </p>
-                        
+
                         {ind.retrieval_source && (
                           <p className="text-[10px] text-slate-400 mt-1 m-0 font-mono">
                             Sumber Bukti: Dokumen Chunk {JSON.stringify(ind.retrieval_source.document_chunk_id)} | SDG Chunk {JSON.stringify(ind.retrieval_source.sdgs_chunk_id)}
@@ -127,7 +154,7 @@ const AnalisisResult = () => {
           )}
         </div>
 
-        {additional_kwargs && additional_kwargs.additional_sdg && additional_kwargs.additional_sdg.length > 0 && (
+        {additional_kwargs?.additional_sdg?.length > 0 && (
           <div className="mb-4 bg-slate-50 p-4 rounded-xl shadow-sm border border-slate-200">
             <p className="text-[13px] font-bold text-slate-700 mb-3 flex items-center gap-2">
               <span>🔗</span> Potensi Keterkaitan SDG Lain
@@ -147,7 +174,7 @@ const AnalisisResult = () => {
           </div>
         )}
 
-        {additional_kwargs && additional_kwargs.note && (
+        {additional_kwargs?.note && (
           <div className="mt-2 bg-amber-50 border border-amber-200 p-4 rounded-xl flex gap-3 items-start shadow-sm">
             <span className="text-[16px]">💡</span>
             <div>

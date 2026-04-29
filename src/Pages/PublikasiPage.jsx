@@ -1,7 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { useSelector } from 'react-redux';
-import { selectAnalisisHistory } from '../store/analisisSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { 
+  selectAnalisisHistory, 
+  loadHistoryData, 
+  selectAnalisisHistoryStatus 
+} from '../store/analisisSlice';
 import PublikasiHeader from '../components/PublikasiPage/PublikasiHeader';
 import PublikasiFilter from '../components/PublikasiPage/PublikasiFilter';
 import PublikasiList from '../components/PublikasiPage/PublikasiList';
@@ -50,21 +54,31 @@ const formatDoc = (doc) => {
   
   return {
     id: doc.job_id || doc.name,
-    name: doc.fileName || doc.name || 'Dokumen Analisis',
+    name: doc.source || doc.fileName || doc.name || 'Dokumen Analisis',
     type: doc.documentType || doc.type || 'T1',
     skor: score,
     sdgs: uniqueSdgs.length > 0 ? uniqueSdgs : (doc.sdgs || []),
-    date: doc.analyzedAt 
-      ? new Date(doc.analyzedAt).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
-      : doc.date,
+    date: doc.timestamp || doc.analyzedAt
+      ? new Date(doc.timestamp || doc.analyzedAt).toLocaleDateString('id-ID', { 
+          day: '2-digit', month: 'short', year: 'numeric' 
+        })
+      : doc.date || '-',
     originalData: doc
   };
 };
 
 const PublikasiPage = () => {
+  const dispatch = useDispatch(); // Tambahkan ini
   const [filter, setFilter] = useState('Semua');
   const [selectedDoc, setSelectedDoc] = useState(null);
   const history = useSelector(selectAnalisisHistory);
+  const historyStatus = useSelector(selectAnalisisHistoryStatus);
+  
+  useEffect(() => {
+    if (historyStatus === 'idle') {
+      dispatch(loadHistoryData());
+    }
+  }, [historyStatus, dispatch]);
   
   const formattedDocs = history.map(formatDoc);
 
@@ -86,7 +100,11 @@ const PublikasiPage = () => {
       <div className="bg-white rounded-[14px] border border-slate-900/5 p-6 shadow-[0_2px_12px_rgba(0,0,0,0.05)]">
         <PublikasiFilter filter={filter} setFilter={setFilter} />
         
-        <PublikasiList filtered={filtered} onSelectDoc={setSelectedDoc} />
+        {historyStatus === 'loading' ? (
+          <div className="text-center py-10">Memuat Data dari Database...</div>
+        ) : (
+          <PublikasiList filtered={filtered} onSelectDoc={setSelectedDoc} />
+        )}
       </div>
 
       <PublikasiModal selectedDoc={selectedDoc} onClose={() => setSelectedDoc(null)} />
