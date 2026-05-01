@@ -36,8 +36,8 @@ const UploadArea = ({ type }) => {
         file: file, 
         type: type,
         params: { 
-          type_api: 'gemini', 
-          model_name: 'gemini-2.5-flash',
+          type_api: import.meta.env.VITE_API_TYPE,
+          model_name: import.meta.env.VITE_API_MODEL_NAME,
         },
       })
     );
@@ -55,8 +55,8 @@ const UploadArea = ({ type }) => {
         file: urlInput,
         type: 'T2',
         params: { 
-          type_api: 'openrouter', 
-          model_name: 'z-ai/glm-5.1',
+          type_api: import.meta.env.VITE_API_TYPE,
+          model_name: import.meta.env.VITE_API_MODEL_NAME,
         },
       })
     );

@@ -11,7 +11,7 @@ import PublikasiFilter from '../components/PublikasiPage/PublikasiFilter';
 import PublikasiList from '../components/PublikasiPage/PublikasiList';
 import PublikasiModal from '../components/PublikasiPage/PublikasiModal';
 
-const formatDoc = (doc) => {
+const formatDoc = (doc, index) => {
   let aiData = doc.result || doc;
   if (typeof aiData === 'string') {
     try { 
@@ -53,7 +53,8 @@ const formatDoc = (doc) => {
   const uniqueSdgs = [...new Set(sdgs)];
   
   return {
-    id: doc.job_id || doc.name,
+    id: doc.id || doc.id_request || doc.job_id || `${doc.source || doc.name}-${index}`,
+    
     name: doc.source || doc.fileName || doc.name || 'Dokumen Analisis',
     type: doc.documentType || doc.type || 'T1',
     skor: score,
@@ -68,7 +69,7 @@ const formatDoc = (doc) => {
 };
 
 const PublikasiPage = () => {
-  const dispatch = useDispatch(); // Tambahkan ini
+  const dispatch = useDispatch(); 
   const [filter, setFilter] = useState('Semua');
   const [selectedDoc, setSelectedDoc] = useState(null);
   const history = useSelector(selectAnalisisHistory);

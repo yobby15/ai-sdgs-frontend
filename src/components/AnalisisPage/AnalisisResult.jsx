@@ -112,7 +112,7 @@ const AnalisisResult = () => {
         <div className="flex flex-col gap-4 mb-5">
           {SDG_details && SDG_details.length > 0 ? (
             SDG_details.map((detail, idx) => (
-              <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
+              <div key={detail.ID_Metric || `metric-${idx}`} className="bg-white rounded-xl overflow-hidden shadow-sm border border-slate-200">
                 <div className="bg-slate-50 px-4 py-2 border-b border-slate-200">
                   <p className="text-[13px] font-bold text-slate-700 m-0">
                     Metrik {detail.ID_Metric}: {detail.metric_name}
@@ -124,7 +124,7 @@ const AnalisisResult = () => {
                     const score = ind.score_relevancy ?? 0;
 
                     return (
-                      <div key={i} className="flex flex-col gap-2">
+                      <div key={ind.ID_Indicator || `ind-${idx}-${i}`} className="flex flex-col gap-2">
                         <div className="flex items-start justify-between">
                           <p className="text-[13px] font-semibold text-slate-800 m-0 w-3/4">
                             {ind.ID_Indicator} - {ind.indicator_name}
@@ -161,7 +161,7 @@ const AnalisisResult = () => {
             </p>
             <div className="flex flex-col gap-3">
               {additional_kwargs.additional_sdg.map((sdg_lain, idx) => (
-                <div key={idx} className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
+                <div key={sdg_lain.SDG_number || `add-sdg-${idx}`} className="bg-white border border-slate-200 rounded-lg p-3 shadow-sm">
                   <p className="text-[12px] font-bold text-sky-700 m-0 mb-1">
                     SDG {sdg_lain.SDG_number}
                   </p>
